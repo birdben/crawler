@@ -36,6 +36,7 @@ class FollowerParser(BaseParser):
                             self.followerRequestQueue.push(nextFollowerPageRequestUrl)
 
                     followerList = responseData["data"]
+                    self.dao.saveUsers(followerList)
                     for follower in followerList:
                         followerId = follower["id"]
                         followerUrlToken = follower["url_token"]
@@ -44,7 +45,6 @@ class FollowerParser(BaseParser):
                             "urlToken": followerUrlToken
                         }
                         followerParserLogger.info("threadName_" + self.threadName + ": followerInfo:" + str(followerInfo))
-                        self.dao.saveUser(followerInfo)
                         self.userDuplicateQueue.push(followerInfo)
                 else:
                     followerParserLogger.debug("Response Error:" + response["reason"])

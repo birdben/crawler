@@ -34,7 +34,7 @@ class Main:
         self.client = httpCoreFactory.createHttpCore(HttpCoreFactory.HTTP_URLLIB)
 
         daoFactory = DaoFactory()
-        self.dao = daoFactory.createUserDao(DaoFactory.FILE)
+        self.dao = daoFactory.createUserDao(DaoFactory.MONGO)
 
         pass
 
