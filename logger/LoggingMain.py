@@ -1,10 +1,11 @@
 import logging
 from logger.LoggingBase import LOG_LEVEL
+from logger.LoggingBase import LOG_BASE_PATH
 
 mainLogger = logging.getLogger('mainLogger')
 mainLogger.setLevel(LOG_LEVEL)
 
-fileHandler = logging.FileHandler('logs/main.log')
+fileHandler = logging.FileHandler(LOG_BASE_PATH + '/logs/main.log')
 fileHandler.setLevel(LOG_LEVEL)
 
 consoleHandler = logging.StreamHandler()

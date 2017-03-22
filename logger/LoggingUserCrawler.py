@@ -1,10 +1,11 @@
 import logging
 from logger.LoggingBase import LOG_LEVEL
+from logger.LoggingBase import LOG_BASE_PATH
 
 userCrawlerLogger = logging.getLogger('userCrawlerLogger')
 userCrawlerLogger.setLevel(LOG_LEVEL)
 
-fileHandler = logging.FileHandler('logs/userCrawler.log')
+fileHandler = logging.FileHandler(LOG_BASE_PATH + '/logs/userCrawler.log')
 fileHandler.setLevel(LOG_LEVEL)
 
 consoleHandler = logging.StreamHandler()
