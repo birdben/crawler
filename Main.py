@@ -1,5 +1,7 @@
+import time
+
 from logger.LoggingMain import mainLogger
-from cache.UserCache import UserCache
+from cache.UserMemoryCache import UserMemoryCache
 from checker.UserDuplicateChecker import UserDuplicateChecker
 from core.HttpCoreFactory import HttpCoreFactory
 from crawler.FollowerCrawler import FollowerCrawler
@@ -18,7 +20,7 @@ class Main:
 
     def __init__(self):
 
-        self.userCache = UserCache()
+        self.userCache = UserMemoryCache()
 
         self.userDuplicateQueue = UserDuplicateQueue()
 
@@ -50,14 +52,15 @@ if __name__ == "__main__":
     ]
 
     # 设置各个处理器的线程数
-    UserDuplicateCheckerThreadCount = 2
-    UserParserThreadCount = 2
-    UserCrawlerThreadCount = 2
-    FollowerParserThreadCount = 2
-    FollowerCrawlerThreadCount = 2
+    UserDuplicateCheckerThreadCount = 5
+    UserParserThreadCount = 5
+    UserCrawlerThreadCount = 5
+    FollowerParserThreadCount = 5
+    FollowerCrawlerThreadCount = 5
 
+    requestId = "threadName_" + "Main" + "_" + str(time.time()) + ": "
     for user in userList:
-        main.userDuplicateQueue.push(user)
+        main.userDuplicateQueue.push(requestId, user)
 
     for i in range(0, UserDuplicateCheckerThreadCount):
         threadName = "UserDuplicateChecker[" + str(i) + "]"
@@ -77,7 +80,7 @@ if __name__ == "__main__":
     for i in range(0, FollowerParserThreadCount):
         threadName = "FollowerParser[" + str(i) + "]"
         # mainLogger.debug(threadName)
-        main.followerParser = FollowerParser(threadName, main.dao, main.followerRequestQueue, main.followerResponseQueue, main.userDuplicateQueue).start()
+        main.followerParser = FollowerParser(threadName, main.followerRequestQueue, main.followerResponseQueue, main.userDuplicateQueue).start()
 
     for i in range(0, FollowerCrawlerThreadCount):
         threadName = "FollowerCrawler[" + str(i) + "]"

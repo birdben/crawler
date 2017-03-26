@@ -11,9 +11,8 @@ class FollowerParser(BaseParser):
 
     SLEEP_TIME = 2
 
-    def __init__(self, threadName, dao, followerRequestQueue, followerResponseQueue, userDuplicateQueue):
+    def __init__(self, threadName, followerRequestQueue, followerResponseQueue, userDuplicateQueue):
         BaseParser.__init__(self, threadName)
-        self.dao = dao
         self.followerRequestQueue = followerRequestQueue
         self.followerResponseQueue = followerResponseQueue
         self.userDuplicateQueue = userDuplicateQueue
@@ -21,34 +20,37 @@ class FollowerParser(BaseParser):
 
     def parse(self):
         while True:
-            time.sleep(FollowerParser.SLEEP_TIME)
-            followerParserLogger.debug("threadName_" + self.threadName + ": start FollowerParser.parse...")
-            response = self.followerResponseQueue.pull()
+            # 不涉及到爬虫时间控制，所以可以不用sleep提高效率
+            # time.sleep(FollowerParser.SLEEP_TIME)
+            requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
+            followerParserLogger.debug(requestId + "start FollowerParser.parse...")
+            response = self.followerResponseQueue.pull(requestId)
             try:
                 if response["status"] == BaseParser.SUCCESS_CODE:
                     responseData = json.loads(response["data"])
-                    # followerParserLogger.debug("threadName_" + self.threadName + ": responseData:" + str(responseData))
+                    followerParserLogger.debug(requestId + "responseData:" + str(responseData))
                     paging = responseData["paging"]
                     if paging is not None:
                         if not paging["is_end"]:
                             nextFollowerPageRequestUrl = paging["next"]
-                            followerParserLogger.info("threadName_" + self.threadName + ": nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
-                            self.followerRequestQueue.push(nextFollowerPageRequestUrl)
+                            followerParserLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
+                            self.followerRequestQueue.push(requestId, nextFollowerPageRequestUrl)
 
                     followerList = responseData["data"]
-                    self.dao.saveUsers(followerList)
+                    # 这里不能直接存储follower信息，因为不能保证唯一性，需要先解析followerId然后存入DuplicateQueue验证唯一后，在通过UserParser存储到DB
+                    # self.dao.saveUsers(followerList)
                     for follower in followerList:
                         followerId = follower["id"]
-                        followerUrlToken = follower["url_token"]
+                        followerName = follower["name"]
                         followerInfo = {
                             "userId": followerId,
-                            "urlToken": followerUrlToken
+                            "userName": followerName
                         }
-                        followerParserLogger.info("threadName_" + self.threadName + ": followerInfo:" + str(followerInfo))
-                        self.userDuplicateQueue.push(followerInfo)
+                        followerParserLogger.debug(requestId + "followerInfo:" + str(followerInfo))
+                        self.userDuplicateQueue.push(requestId, followerInfo)
                 else:
                     followerParserLogger.debug("Response Error:" + response["reason"])
-                followerParserLogger.debug("threadName_" + self.threadName + ": end FollowerParser.parse...")
+                followerParserLogger.debug(requestId + ": end FollowerParser.parse...")
             except Exception as e:
-                followerParserLogger.error("解析Response出错")
+                followerParserLogger.error(requestId + "解析Response出错")
                 followerParserLogger.error(e)

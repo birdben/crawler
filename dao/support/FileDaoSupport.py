@@ -4,8 +4,8 @@ from logger.LoggingRoot import rootLogger
 
 class FileDaoSupport(DaoSupport):
     def __init__(self):
-        pass
+        super().__init__()
 
-    def getConn(self):
-        rootLogger.debug("FileDaoSupport getConn start")
-        rootLogger.debug("FileDaoSupport getConn end")
+    def _getConn(self):
+        rootLogger.debug("FileDaoSupport _getConn start")
+        rootLogger.debug("FileDaoSupport _getConn end")

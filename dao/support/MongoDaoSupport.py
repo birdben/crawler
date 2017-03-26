@@ -8,9 +8,9 @@ from pymongo import mongo_client
 
 class MongoDaoSupport(DaoSupport):
     def __init__(self):
-        pass
+        super().__init__()
 
-    def getConn(self):
+    def _getConn(self):
         rootLogger.debug("MongoDaoSupport getConn start")
         conn = mongo_client.MongoClient(
             host=MongoConfig.HOST,

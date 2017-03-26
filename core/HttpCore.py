@@ -15,73 +15,44 @@ Accept-Encoding	告知服务器采用何种压缩方式	Content-Encoding
 
 
 class HttpCore:
-    httpClientResponse = {
-        "status": 9999,
-        "reason": "Unknown",
-        "data": ""
-    }
-    httpClientRequest = {
-        "url": "",
-        "params": {
-            "limit": 20,
-            "offset": 0
-        }
-    }
-
     GET = "GET"
     POST = "POST"
-    HOST = "www.zhihu.com"
 
-    __DEFAULT_METHOD = "GET"
-    __DEFAULT_PARAMS = {
-        "limit": 20,
-        "offset": 0
-    }
-    __DEFAULT_URL = "/api/v4/members/zhang-jia-wei/followers"
-    # __DEFAULT_PARAMS = "?include=data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics"
-    __DEFAULT_HEADERS = {
-        'Host': 'www.zhihu.com',
-        'Authorization': 'Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        # 告知服务器采用何种压缩方式
-        # 'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-        'origin': 'https://www.zhihu.com',
-        'x-udid': 'AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=',
-        "Content-type": "application/x-www-form-urlencoded",
-        "Accept": "text/plain"
-    }
-
+    # 抓取Follower信息
     # https://www.zhihu.com/api/v4/members/zhang-jia-wei/followers?include=data%5B*%5D.answer_count%2Carticles_count%2Cgender%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F(type%3Dbest_answerer)%5D.topics&offset=60&limit=20
     # data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics
     # 定义http请求参数
+
+    # 抓取User信息
+    # https://api.zhihu.com/people/bafadeef906dcdc5b6b37397d7091665
 
     def __init__(self):
         pass
 
     def validatedRequest(self, httpClientRequest):
         reason = ""
+        if "host" not in httpClientRequest:
+            reason = "host can not be None"
+            return reason
         if "method" not in httpClientRequest:
             reason = "method can not be None"
             return reason
         if "url" not in httpClientRequest:
             reason = "url can not be None"
             return reason
+        if "params" not in httpClientRequest:
+            reason = "params can not be None"
+            return reason
+        if "headers" not in httpClientRequest:
+            reason = "headers can not be None"
+            return reason
         return reason
 
-    def defaultRequest(self, httpClientRequest):
-        if "headers" not in httpClientRequest:
-            httpClientRequest["headers"] = HttpCore.__DEFAULT_HEADERS
-        if "params" not in httpClientRequest:
-            httpClientRequest["params"] = HttpCore.__DEFAULT_PARAMS
-        return httpClientRequest
+    def doGetRequestHandler(self, requestId, request):
+        return HttpClientResponse().getDefaultResponse()
 
-    def doGetRequestHandler(self, request):
-        return self.httpClientResponse
-
-    def doPostRequestHandler(self, request):
-        return self.httpClientResponse
+    def doPostRequestHandler(self, requestId, request):
+        return HttpClientResponse().getDefaultResponse()
 
     def buildParamsUrl(self, params):
         paramsUrl = ""
@@ -93,38 +64,53 @@ class HttpCore:
                 paramsUrl += "&" + key + "=" + value
         return paramsUrl
 
-    def doRequest(self, httpClientRequest):
+    def doRequest(self, requestId, httpClientRequest):
+        rootLogger.debug(requestId + "doRequest request: " + str(httpClientRequest))
         if self.validatedRequest(httpClientRequest) != "":
-            self.httpClientResponse["reason"] = self.validatedRequest(httpClientRequest)
-            return self.httpClientResponse
+            httpClientResponse = HttpClientResponse().getDefaultResponse()
+            httpClientResponse["reason"] = self.validatedRequest(httpClientRequest)
+            return httpClientResponse
 
-        request = self.defaultRequest(httpClientRequest)
-
-        method = request["method"]
+        method = httpClientRequest["method"]
         if method == HttpCore.GET:
-            self.doGetRequest(httpClientRequest)
+            httpClientResponse = self.doGetRequest(requestId, httpClientRequest)
         elif method == HttpCore.POST:
-            self.doPostRequest(httpClientRequest)
+            httpClientResponse = self.doPostRequest(requestId, httpClientRequest)
         else:
-            self.doGetRequest(httpClientRequest)
+            httpClientResponse = self.doGetRequest(requestId, httpClientRequest)
         # TODO: PUT
         # TODO: HEAD
-        return self.httpClientResponse
+        rootLogger.debug(requestId + "doRequest response: " + str(httpClientResponse))
+        return httpClientResponse
 
-    def doGetRequest(self, httpClientRequest):
+    def doGetRequest(self, requestId, httpClientRequest):
         try:
-            self.httpClientResponse = self.doGetRequestHandler(httpClientRequest)
+            httpClientResponse = self.doGetRequestHandler(requestId, httpClientRequest)
         # TODO: HttpCoreRequestException
         except Exception as e:
-            rootLogger.error("doGetRequest请求失败")
+            rootLogger.error(requestId + "doGetRequest请求失败")
             rootLogger.error(e)
-        return self.httpClientResponse
+        return httpClientResponse
 
-    def doPostRequest(self, httpClientRequest):
+    def doPostRequest(self, requestId, httpClientRequest):
         try:
-            self.httpClientResponse = self.doPostRequestHandler(httpClientRequest)
+            httpClientResponse = self.doPostRequestHandler(requestId, httpClientRequest)
         # TODO: HttpCoreRequestException
         except Exception as e:
-            rootLogger.error("doPostRequest请求失败")
+            rootLogger.error(requestId + "doPostRequest请求失败")
             rootLogger.error(e)
-        return self.httpClientResponse
+        return httpClientResponse
+
+
+class HttpClientResponse:
+
+    def __init__(self):
+        pass
+
+    def getDefaultResponse(self):
+        httpClientResponse = {
+            "status": 9999,
+            "reason": "Unknown",
+            "data": ""
+        }
+        return httpClientResponse

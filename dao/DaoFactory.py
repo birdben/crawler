@@ -24,7 +24,9 @@ class DaoFactory:
 if __name__ == "__main__":
 
     factory = DaoFactory()
-    dao = factory.createUserDao(DaoFactory.MONGO)
+    mysqlDao = factory.createUserDao(DaoFactory.MYSQL)
+    mongoDao = factory.createUserDao(DaoFactory.MONGO)
+    fileDao = factory.createUserDao(DaoFactory.FILE)
     userInfoList = [{
       "is_followed": False,
       "avatar_url_template": "https://pic4.zhimg.com/v2-83783203a87d7d38d67a359df5049b0f_{size}.jpg",
@@ -65,4 +67,6 @@ if __name__ == "__main__":
       "id": "25c96207b652a4a50fb4fa2e23790a84",
       "articles_count": 0
     }]
-    response = dao.saveUsers(userInfoList)
+    response = mongoDao._saveUsers(userInfoList)
+    response = mysqlDao._saveUsers(userInfoList)
+    response = fileDao._saveUsers(userInfoList)

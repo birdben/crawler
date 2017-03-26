@@ -1,4 +1,7 @@
 import threading
+
+import time
+
 from logger.LoggingChecker import checkerLogger
 
 
@@ -18,18 +21,18 @@ class UserDuplicateChecker(threading.Thread):
 
     def checkUserDuplicate(self):
         while True:
-            checkerLogger.debug("threadName_" + self.threadName + ": start UserDuplicateChecker.checkUserDuplicate...")
-            userInfo = self.userDuplicateQueue.pull()
-            checkerLogger.info("threadName_" + self.threadName + ": userInfo:" + str(userInfo))
+            # 这里不涉及到爬虫时间控制，所以可以不用sleep提高效率
+            requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
+            checkerLogger.debug(requestId + "start UserDuplicateChecker.checkUserDuplicate...")
+            userInfo = self.userDuplicateQueue.pull(requestId)
+            checkerLogger.debug(requestId + "userInfo:" + str(userInfo))
             if userInfo is None:
                 continue
             userId = userInfo["userId"]
-            urlToken = userInfo["urlToken"]
-            if self.userCache.exists(userId):
-                # 用户信息已经存在，继续读取其他DuplicateQueue的消息
-                continue
+            if self.userCache.put(requestId, userId, userInfo):
+                # 添加到缓存返回True，说明缓存中用户信息不存在，要添加到requestQueue中
+                self.userRequestQueue.push(requestId, userId)
             else:
-                # 用户信息不存在，则添加到Cache中，也要添加到requestQueue中
-                self.userCache.put(userId, userInfo)
-                self.userRequestQueue.push(urlToken)
-            checkerLogger.debug("threadName_" + self.threadName + ": end UserDuplicateChecker.checkUserDuplicate...")
+                # 添加到缓存返回False，说明缓存中用户信息已经存在，继续读取其他DuplicateQueue的消息
+                continue
+            checkerLogger.debug(requestId + "end UserDuplicateChecker.checkUserDuplicate...")

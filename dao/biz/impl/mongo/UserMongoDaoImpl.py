@@ -5,26 +5,40 @@ from logger.LoggingRoot import rootLogger
 
 
 class UserMongoDaoImpl(MongoDaoSupport, UserDao):
-    def __init__(self):
-        MongoDaoSupport.__init__(self)
+    def _deleteUserById(self, userId):
         pass
 
-    def saveUser(self, userInfo):
-        rootLogger.debug("UserMongoDaoImpl saveUser start")
+    def _saveOrUpdateUser(self, userInfo):
+        pass
+
+    def _findUserById(self, userId):
+        pass
+
+    def _saveOrUpdateUsers(self, userInfoList):
+        pass
+
+    def _updateUser(self, userInfo):
+        pass
+
+    def __init__(self):
+        super().__init__()
+
+    def _saveUser(self, requestId, userInfo):
+        rootLogger.debug(requestId + "UserMongoDaoImpl saveUser start")
         try:
             conn = self.getConn()
             db = conn[DB_ZHIHU]
             users = db[TABLE_USER]
             users.insert_one(userInfo)
         except Exception as e:
-            rootLogger.error("UserMongoDaoImpl saveUser error")
+            rootLogger.error(requestId + "UserMongoDaoImpl saveUser error")
             rootLogger.error(e)
-        rootLogger.debug("UserMongoDaoImpl saveUser end")
+        rootLogger.debug(requestId + "UserMongoDaoImpl saveUser end")
 
-    def saveUsers(self, userInfoList):
+    def _saveUsers(self, userInfoList):
         rootLogger.debug("UserMongoDaoImpl saveUsers start")
         try:
-            conn = self.getConn()
+            conn = self._getConn()
             db = conn[DB_ZHIHU]
             users = db[TABLE_USER]
             users.insert_many(userInfoList)
@@ -33,7 +47,7 @@ class UserMongoDaoImpl(MongoDaoSupport, UserDao):
             rootLogger.error(e)
         rootLogger.debug("UserMongoDaoImpl saveUsers end")
 
-    def findUserByCondition(self, param):
+    def _findUserByCondition(self, param):
         rootLogger.debug("UserMongoDaoImpl findUserByCondition start")
         try:
             conn = self.getConn()

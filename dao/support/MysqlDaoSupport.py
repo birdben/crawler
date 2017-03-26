@@ -4,8 +4,8 @@ from logger.LoggingRoot import rootLogger
 
 class MysqlDaoSupport(DaoSupport):
     def __init__(self):
-        pass
+        super().__init__()
 
-    def getConn(self):
-        rootLogger.debug("MysqlDaoSupport getConn start")
-        rootLogger.debug("MysqlDaoSupport getConn end")
+    def _getConn(self):
+        rootLogger.debug("MysqlDaoSupport _getConn start")
+        rootLogger.debug("MysqlDaoSupport _getConn end")

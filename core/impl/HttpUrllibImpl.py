@@ -3,7 +3,7 @@
 
 import urllib3
 
-from core.HttpCore import HttpCore
+from core.HttpCore import HttpCore, HttpClientResponse
 from logger.LoggingRoot import rootLogger
 
 
@@ -13,40 +13,106 @@ class HttpUrllibImpl(HttpCore):
     def __init__(self):
         pass
 
-    def buildUrl(self, request):
-        url = HttpCore.HOST + request["url"] + self.buildParamsUrl(request["params"])
-        rootLogger.info("buildUrl:" + url)
+    def buildUrl(self, requestId, request):
+        url = request["host"] + request["url"] + self.buildParamsUrl(request["params"])
+        rootLogger.debug(requestId + "HttpUrllibImpl buildUrl:" + url)
         return url
 
-    def doGetRequestHandler(self, httpClientRequest):
-        request = self.defaultRequest(httpClientRequest)
+    def doGetRequestHandler(self, requestId, httpClientRequest):
         http = urllib3.PoolManager()
-        response = http.request(HttpCore.GET, self.buildUrl(httpClientRequest), None, request["headers"])
-        self.httpClientResponse["status"] = response.status
-        self.httpClientResponse["reason"] = response.reason
-        self.httpClientResponse["data"] = response.data.decode("utf-8")
-        # rootLogger.debug("status:" + str(self.httpClientResponse["status"]))
-        # rootLogger.debug("reason:" + self.httpClientResponse["reason"])
-        # rootLogger.debug("data:" + self.httpClientResponse["data"])
-        return self.httpClientResponse
+        response = http.request(HttpCore.GET, self.buildUrl(requestId, httpClientRequest), None, httpClientRequest["headers"])
+        httpClientResponse = HttpClientResponse().getDefaultResponse()
+        httpClientResponse["status"] = response.status
+        httpClientResponse["reason"] = response.reason
+        httpClientResponse["data"] = response.data.decode("utf-8")
+        # rootLogger.debug("status:" + str(httpClientResponse["status"]))
+        # rootLogger.debug("reason:" + httpClientResponse["reason"])
+        # rootLogger.debug("data:" + httpClientResponse["data"])
+        return httpClientResponse
 
-    def doPostRequestHandler(self, httpClientRequest):
-        request = self.defaultRequest(httpClientRequest)
+    def doPostRequestHandler(self, requestId, httpClientRequest):
         http = urllib3.PoolManager()
-        response = http.request(HttpCore.POST, self.buildUrl(httpClientRequest), None, request["headers"])
-        self.httpClientResponse["status"] = response.status
-        self.httpClientResponse["reason"] = response.reason
-        self.httpClientResponse["data"] = response.data.decode("utf-8")
-        # rootLogger.debug("status:" + str(self.httpClientResponse["status"]))
-        # rootLogger.debug("reason:" + self.httpClientResponse["reason"])
-        # rootLogger.debug("data:" + self.httpClientResponse["data"])
-        return self.httpClientResponse
+        response = http.request(HttpCore.POST, self.buildUrl(requestId, httpClientRequest), None, httpClientRequest["headers"])
+        httpClientResponse = HttpClientResponse().getDefaultResponse()
+        httpClientResponse["status"] = response.status
+        httpClientResponse["reason"] = response.reason
+        httpClientResponse["data"] = response.data.decode("utf-8")
+        # rootLogger.debug("status:" + str(httpClientResponse["status"]))
+        # rootLogger.debug("reason:" + httpClientResponse["reason"])
+        # rootLogger.debug("data:" + httpClientResponse["data"])
+        return httpClientResponse
 
 if __name__ == "__main__":
     httpClient = HttpUrllibImpl()
-    request = {
+
+    # 客户端api接口，通过用户id获取user信息
+    userRequest = {
+        "host": "api.zhihu.com",
         "method": "GET",
-        "url": "/api/v4/members/zhang-jia-wei/followers"
+        "url": "/people/bafadeef906dcdc5b6b37397d7091665",
+        "params": {},
+        "headers": {
+            "Host": "api.zhihu.com",
+            "Authorization": "Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0",
+            # "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+            "x-udid": "AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=",
+            "Content-type": "application/x-www-form-urlencoded",
+            "Accept": "*/*",
+            "X-API-Version": "3.0.52"
+        }
     }
-    response = httpClient.doRequest(request)
-    rootLogger.debug("HttpUrllibImpl response:" + str(response))
+
+    # 客户端api接口，通过用户id获取follower信息，可以与userId关联
+    followerRequest = {
+        "host": "api.zhihu.com",
+        "method": "GET",
+        "url": "/people/bafadeef906dcdc5b6b37397d7091665/followers?limit=20&offset=0",
+        "params": {},
+        "headers": {
+            "Host": "api.zhihu.com",
+            "Authorization": "Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0",
+            # "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+            "x-udid": "AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=",
+            "Content-type": "application/x-www-form-urlencoded",
+            "Accept": "*/*",
+            "X-API-Version": "3.0.52"
+        }
+    }
+
+    # web接口，通过用户name获取follower信息，不能与userId关联，所以使用客户端的api接口替换
+    """
+    followerRequest = {
+        "host": "www.zhihu.com",
+        "method": "GET",
+        "url": "/api/v4/members/zhang-jia-wei/followers",
+        "params": {
+            "offset": 0,
+            "limit": 20
+        },
+        "headers": {
+            "Host": "www.zhihu.com",
+            "Authorization": "Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            # 告知服务器采用何种压缩方式
+            # "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+            "origin": "https://www.zhihu.com",
+            "x-udid": "AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=",
+            "Content-type": "application/x-www-form-urlencoded",
+            "Accept": "text/plain"
+        }
+    }
+    """
+
+    # 测试抓取User信息
+    userResponse = httpClient.doRequest(userRequest)
+    rootLogger.debug("HttpClientImpl User response:" + str(userResponse))
+
+    # 测试抓取Follower信息
+    followerResponse = httpClient.doRequest(followerRequest)
+    rootLogger.debug("HttpClientImpl Follower response:" + str(followerResponse))

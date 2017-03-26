@@ -1,3 +1,4 @@
+import random
 import threading
 import re
 import time
@@ -7,7 +8,8 @@ from urllib import request
 
 class FollowerCrawler(threading.Thread):
 
-    SLEEP_TIME = 2
+    SLEEP_TIME_MIN = 1
+    SLEEP_TIME_MAX = 5
 
     def __init__(self, threadName, followerRequestQueue, followerResponseQueue, client):
         threading.Thread.__init__(self)
@@ -24,33 +26,48 @@ class FollowerCrawler(threading.Thread):
 
     def fetch(self):
         while True:
-            time.sleep(FollowerCrawler.SLEEP_TIME)
-            followerCrawlerLogger.debug("threadName_" + self.threadName + ": start FollowerCrawler.fetch...")
-            nextFollowerPageRequestUrl = self.followerRequestQueue.pull()
-            followerCrawlerLogger.info("threadName_" + self.threadName + ": nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
+            # 这里涉及到爬虫时间控制，所以需要随机sleep时间
+            time.sleep(random.randint(FollowerCrawler.SLEEP_TIME_MIN, FollowerCrawler.SLEEP_TIME_MAX))
+            requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
+            followerCrawlerLogger.debug(requestId + "start FollowerCrawler.fetch...")
+            nextFollowerPageRequestUrl = self.followerRequestQueue.pull(requestId)
+            followerCrawlerLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
             followerObj = self.parseFollowerUrl(nextFollowerPageRequestUrl)
-            followerCrawlerLogger.info("threadName_" + self.threadName + ": followerObj:" + str(followerObj))
-            request = {
+            followerCrawlerLogger.debug(requestId + "followerObj:" + str(followerObj))
+            followerRequest = {
+                "host": "api.zhihu.com",
                 "method": "GET",
-                "url": "/api/v4/members/" + followerObj["urlToken"] + "/followers",
-                "params": followerObj["params"]
+                "url": "/people/" + followerObj["userId"] + "/followers",
+                "params": followerObj["params"],
+                "headers": {
+                    "Host": "api.zhihu.com",
+                    "Authorization": "Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0",
+                    # "Accept-Encoding": "gzip, deflate",
+                    "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+                    "x-udid": "AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=",
+                    "Content-type": "application/x-www-form-urlencoded",
+                    "Accept": "*/*",
+                    "X-API-Version": "3.0.52"
+                }
             }
-            response = self.client.doRequest(request)
-            # followerCrawlerLogger.debug("threadName_" + self.threadName + ": response:" + str(response))
-            self.followerResponseQueue.push(response)
-            followerCrawlerLogger.debug("threadName_" + self.threadName + ": end FollowerCrawler.fetch...")
+            response = self.client.doRequest(requestId, followerRequest)
+            followerCrawlerLogger.debug(requestId + "response:" + str(response))
+            self.followerResponseQueue.push(requestId, response)
+            followerCrawlerLogger.debug(requestId + "end FollowerCrawler.fetch...")
 
+    # 抓取的不是web接口，可以不需要该方法解析url参数了
     def parseFollowerUrl(self, url):
         # url = request.unquote(url)
         # print(url)
         followerObj = {
-            "urlToken": "",
+            "userId": "",
             "params": {}
         }
-        urlTokenPattern = "http://www.zhihu.com/api/v4/members/(.+?)/followers\?(.*)"
-        urlToken = re.search(urlTokenPattern, url).group(1)
-        paramsString = re.search(urlTokenPattern, url).group(2)
-        followerCrawlerLogger.info("urlToken:" + urlToken + ", paramsString:" + paramsString)
+        urlPattern = "https://api.zhihu.com/people/(.+?)/followers\?(.*)"
+        userId = re.search(urlPattern, url).group(1)
+        paramsString = re.search(urlPattern, url).group(2)
+        followerCrawlerLogger.debug("userId:" + userId + ", paramsString:" + paramsString)
         params = paramsString.split("&")
         paramObj = {}
         for param in params:
@@ -58,11 +75,11 @@ class FollowerCrawler(threading.Thread):
             paramName = kvObj[0]
             paramValue = kvObj[1]
             paramObj[paramName] = paramValue
-        followerObj["urlToken"] = urlToken
+        followerObj["userId"] = userId
         followerObj["params"] = paramObj
         return followerObj
 
 if __name__ == "__main__":
-    url = "http://www.zhihu.com/api/v4/members/zhang-jia-wei/followers?include=data%5B%2A%5D.answer_count%2Carticles_count%2Cgender%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit=20&offset=1300660"
+    url = "https://api.zhihu.com/people/bafadeef906dcdc5b6b37397d7091665/followers?limit=20&offset=20"
     # followerObj = parseFollowerUrl(url)
     # followerCrawlerLogger.debug("followerObj:" + str(followerObj))

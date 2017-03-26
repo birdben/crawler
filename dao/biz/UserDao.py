@@ -1,24 +1,39 @@
-from logger.LoggingRoot import rootLogger
+from abc import abstractmethod, ABCMeta
 
 
-class UserDao:
+class UserDao(metaclass=ABCMeta):
+
     def __init__(self):
         pass
 
-    def saveUser(self, userInfo):
-        rootLogger.debug("UserDao saveUser...")
+    @abstractmethod
+    def _saveUser(self, userInfo):
+        """Abstract Method _saveUser"""
 
-    def saveUsers(self, userInfoList):
-        rootLogger.debug("UserDao saveUsers...")
+    @abstractmethod
+    def _saveUsers(self, userInfoList):
+        """Abstract Method _saveUsers"""
 
-    def updateUser(self, userInfo):
-        rootLogger.debug("UserDao updateUser...")
+    @abstractmethod
+    def _saveOrUpdateUser(self, userInfo):
+        """Abstract Method _saveOrUpdateUser"""
 
-    def deleteUserById(self, userId):
-        rootLogger.debug("UserDao deleteUserById...")
+    @abstractmethod
+    def _saveOrUpdateUsers(self, userInfoList):
+        """Abstract Method _saveOrUpdateUsers"""
 
-    def findUserById(self, userId):
-        rootLogger.debug("UserDao findUserById...")
+    @abstractmethod
+    def _updateUser(self, userInfo):
+        """Abstract Method _updateUser"""
 
-    def findUserByCondition(self, param):
-        rootLogger.debug("UserDao findUserByCondition...")
+    @abstractmethod
+    def _deleteUserById(self, userId):
+        """Abstract Method _deleteUserById"""
+
+    @abstractmethod
+    def _findUserById(self, userId):
+        """Abstract Method _findUserById"""
+
+    @abstractmethod
+    def _findUserByCondition(self, param):
+        """Abstract Method _findUserByCondition"""

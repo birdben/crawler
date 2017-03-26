@@ -21,34 +21,25 @@ class UserParser(BaseParser):
 
     def parse(self):
         while True:
-            time.sleep(UserParser.SLEEP_TIME)
-            userParserLogger.debug("threadName_" + self.threadName + ": start UserParser.parse...")
-            response = self.userResponseQueue.pull()
+            # 这里不涉及到爬虫时间控制，所以可以不用sleep提高效率
+            # time.sleep(UserParser.SLEEP_TIME)
+            requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
+            userParserLogger.debug(requestId + "start UserParser.parse...")
+            response = self.userResponseQueue.pull(requestId)
             try:
                 if response["status"] == BaseParser.SUCCESS_CODE:
-                    responseData = json.loads(response["data"])
-                    # userParserLogger.debug("threadName_" + self.threadName + ": responseData:" + str(responseData))
-                    paging = responseData["paging"]
-                    if paging is not None:
-                        if not paging["is_end"]:
-                            nextFollowerPageRequestUrl = paging["next"]
-                            userParserLogger.info("threadName_" + self.threadName + ": nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
-                            self.followerRequestQueue.push(nextFollowerPageRequestUrl)
+                    userInfo = json.loads(response["data"])
+                    userId = userInfo["id"]
+                    userParserLogger.debug(requestId + "userInfo:" + str(userInfo))
+                    self.dao.saveUser(requestId, userInfo)
 
-                    followerList = responseData["data"]
-                    self.dao.saveUsers(followerList)
-                    for follower in followerList:
-                        followerId = follower["id"]
-                        followerUrlToken = follower["url_token"]
-                        followerInfo = {
-                            "userId": followerId,
-                            "urlToken": followerUrlToken
-                        }
-                        userParserLogger.info("threadName_" + self.threadName + ": followerInfo:" + str(followerInfo))
-                        self.userDuplicateQueue.push(followerInfo)
+                    # 初始化follower接口参数，并且存储到followerRequestQueue中
+                    followerUrl = "https://api.zhihu.com/people/" + userId + "/followers?limit=20&offset=0"
+                    userParserLogger.debug(requestId + "followerUrl:" + str(followerUrl))
+                    self.followerRequestQueue.push(requestId, followerUrl)
                 else:
                     userParserLogger.debug("Response Error:" + response["reason"])
-                userParserLogger.debug("threadName_" + self.threadName + ": end UserParser.parse...")
+                userParserLogger.debug(requestId + "end UserParser.parse...")
             except Exception as e:
-                userParserLogger.error("解析Response出错")
+                userParserLogger.error(requestId + "解析Response出错")
                 userParserLogger.error(e)

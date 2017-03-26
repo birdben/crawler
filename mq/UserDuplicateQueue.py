@@ -8,10 +8,11 @@ class UserDuplicateQueue:
         self.userDuplicateQueue = queue.Queue(maxsize=10000)
         pass
 
-    def push(self, message):
-        rootLogger.debug("push UserDuplicateQueue size:" + str(self.userDuplicateQueue.qsize()))
+    def push(self, requestId, message):
+        rootLogger.debug(requestId + "UserDuplicateQueue push:" + str(message))
         self.userDuplicateQueue.put(message)
 
-    def pull(self):
-        rootLogger.debug("pull UserDuplicateQueue size:" + str(self.userDuplicateQueue.qsize()))
-        return self.userDuplicateQueue.get()
+    def pull(self, requestId):
+        message = self.userDuplicateQueue.get()
+        rootLogger.debug(requestId + "UserDuplicateQueue pull:" + str(message))
+        return message

@@ -1,3 +1,4 @@
+import random
 import threading
 import time
 from logger.LoggingUserCrawler import userCrawlerLogger
@@ -5,7 +6,8 @@ from logger.LoggingUserCrawler import userCrawlerLogger
 
 class UserCrawler(threading.Thread):
 
-    SLEEP_TIME = 2
+    SLEEP_TIME_MIN = 1
+    SLEEP_TIME_MAX = 5
 
     def __init__(self, threadName, userRequestQueue, userResponseQueue, client):
         threading.Thread.__init__(self)
@@ -22,15 +24,30 @@ class UserCrawler(threading.Thread):
 
     def fetch(self):
         while True:
-            time.sleep(UserCrawler.SLEEP_TIME)
-            userCrawlerLogger.debug("threadName_" + self.threadName + ": start UserCrawler.fetch...")
-            urlToken = self.userRequestQueue.pull()
-            userCrawlerLogger.info("threadName_" + self.threadName + ": urlToken:" + str(urlToken))
-            request = {
+            # 这里涉及到爬虫时间控制，所以需要随机sleep时间
+            time.sleep(random.randint(UserCrawler.SLEEP_TIME_MIN, UserCrawler.SLEEP_TIME_MAX))
+            requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
+            userCrawlerLogger.debug(requestId + "start UserCrawler.fetch...")
+            userId = self.userRequestQueue.pull(requestId)
+            userCrawlerLogger.debug(requestId + "userId:" + str(userId))
+            userRequest = {
+                "host": "api.zhihu.com",
                 "method": "GET",
-                "url": "/api/v4/members/" + urlToken + "/followers"
+                "url": "/people/" + userId,
+                "params": {},
+                "headers": {
+                    "Host": "api.zhihu.com",
+                    "Authorization": "Bearer Mi4wQUFBQU9qRWdBQUFBQU1MZThYVndDeGNBQUFCaEFsVk5VbzNzV0FESHZyN1FkdU53bllZOE5tRUtMZHRXTWNEcmRB|1489305735|7b00a5eb2137cfae4ad342e47322d92e18d1d3d6",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:51.0) Gecko/20100101 Firefox/51.0",
+                    # "Accept-Encoding": "gzip, deflate",
+                    "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+                    "x-udid": "AADC3vF1cAuPTkgQezG76kgARvc5TuxQdrE=",
+                    "Content-type": "application/x-www-form-urlencoded",
+                    "Accept": "*/*",
+                    "X-API-Version": "3.0.52"
+                }
             }
-            response = self.client.doRequest(request)
-            # userCrawlerLogger.debug("threadName_" + self.threadName + ": response:" + str(response))
-            self.userResponseQueue.push(response)
-            userCrawlerLogger.debug("threadName_" + self.threadName + ": end UserCrawler.fetch...")
+            response = self.client.doRequest(requestId, userRequest)
+            userCrawlerLogger.debug(requestId + "response:" + str(response))
+            self.userResponseQueue.push(requestId, response)
+            userCrawlerLogger.debug(requestId + "end UserCrawler.fetch...")

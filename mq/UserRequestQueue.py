@@ -8,10 +8,11 @@ class UserRequestQueue:
         self.userRequestQueue = queue.Queue(maxsize=10000)
         pass
 
-    def push(self, request):
-        rootLogger.debug("push UserRequestQueue size:" + str(self.userRequestQueue.qsize()))
+    def push(self, requestId, request):
+        rootLogger.debug(requestId + "UserRequestQueue push:" + str(request))
         self.userRequestQueue.put(request)
 
-    def pull(self):
-        rootLogger.debug("pull UserRequestQueue size:" + str(self.userRequestQueue.qsize()))
-        return self.userRequestQueue.get()
+    def pull(self, requestId):
+        request = self.userRequestQueue.get()
+        rootLogger.debug(requestId + "UserRequestQueue pull:" + str(request))
+        return request

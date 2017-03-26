@@ -8,10 +8,11 @@ class FollowerRequestQueue:
         self.followerRequestQueue = queue.Queue(maxsize=10000)
         pass
 
-    def push(self, request):
-        rootLogger.debug("push FollowerRequestQueue size:" + str(self.followerRequestQueue.qsize()))
+    def push(self, requestId, request):
+        rootLogger.debug(requestId + "FollowerRequestQueue push:" + str(request))
         self.followerRequestQueue.put(request)
 
-    def pull(self):
-        rootLogger.debug("pull FollowerRequestQueue size:" + str(self.followerRequestQueue.qsize()))
-        return self.followerRequestQueue.get()
+    def pull(self, requestId):
+        request = self.followerRequestQueue.get()
+        rootLogger.debug(requestId + "FollowerRequestQueue pull:" + str(request))
+        return request

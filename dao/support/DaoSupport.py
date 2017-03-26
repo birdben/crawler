@@ -1,10 +1,11 @@
-from logger.LoggingRoot import rootLogger
+from abc import abstractmethod, ABCMeta
 
 
-class DaoSupport:
+class DaoSupport(metaclass=ABCMeta):
+
     def __init__(self):
         pass
 
-    def getConn(self):
-        rootLogger.debug("DaoSupport getConn start")
-        rootLogger.debug("DaoSupport getConn end")
+    @abstractmethod
+    def _getConn(self):
+        """Abstract Method _getConn"""
