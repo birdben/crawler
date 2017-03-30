@@ -26,6 +26,7 @@ $ db.users.aggregate([
 - http://api.mongodb.com/python/current/installation.html
 - http://api.mongodb.com/python/current/api/pymongo/mongo_client.html#pymongo.mongo_client.MongoClient
 - http://api.mongodb.com/python/current/faq.html#multiprocessing
+- http://api.mongodb.com/python/current/faq.html#writes-and-ids
 
 ##### MySQL
 
@@ -37,12 +38,27 @@ $ db.users.aggregate([
 
 ### Feature
 
-1. Redis实现Cache
-2. 支持MySQL，Elasticsearch等持久化存储
-3. 挂载多个代理IP，不至于被封
-4. 补充组件图
+##### 2.x Feature
+
+1. 支持MySQL，Elasticsearch等持久化存储
+
+##### 1.0.3 Feature
+
+1. 处理线程的调优
+2. 挂载多个代理IP，不至于被封
+3. 补充组件图
 
 ### Relase Note
+
+##### 1.0.2:
+
+1. 使用RedisCache代替MemoryCache实现去重
+2. 实现抽象类BaseCache，使用不同的缓存方式来进行去重
+3. 处理从Queue中拉取出来的消息为空的情况
+4. 统一规范方法命名规则
+5. 支持Mongo指定用户名和密码创建连接
+6. 使用Docker容器提供Redis和Mongo服务
+7. 通过日志监控Queue的堆积情况，不限制Queue的大小
 
 ##### 1.0.1:
 
