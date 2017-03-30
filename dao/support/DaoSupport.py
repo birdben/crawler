@@ -7,5 +7,5 @@ class DaoSupport(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _getConn(self):
-        """Abstract Method _getConn"""
+    def getConn(self):
+        """Abstract Method getConn"""

@@ -7,33 +7,33 @@ class UserDao(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _saveUser(self, userInfo):
-        """Abstract Method _saveUser"""
+    def saveUser(self, userInfo):
+        """Abstract Method saveUser"""
 
     @abstractmethod
-    def _saveUsers(self, userInfoList):
-        """Abstract Method _saveUsers"""
+    def saveUsers(self, userInfoList):
+        """Abstract Method saveUsers"""
 
     @abstractmethod
-    def _saveOrUpdateUser(self, userInfo):
-        """Abstract Method _saveOrUpdateUser"""
+    def saveOrUpdateUser(self, userInfo):
+        """Abstract Method saveOrUpdateUser"""
 
     @abstractmethod
-    def _saveOrUpdateUsers(self, userInfoList):
-        """Abstract Method _saveOrUpdateUsers"""
+    def saveOrUpdateUsers(self, userInfoList):
+        """Abstract Method saveOrUpdateUsers"""
 
     @abstractmethod
-    def _updateUser(self, userInfo):
-        """Abstract Method _updateUser"""
+    def updateUser(self, userInfo):
+        """Abstract Method updateUser"""
 
     @abstractmethod
-    def _deleteUserById(self, userId):
-        """Abstract Method _deleteUserById"""
+    def deleteUserById(self, userId):
+        """Abstract Method deleteUserById"""
 
     @abstractmethod
-    def _findUserById(self, userId):
-        """Abstract Method _findUserById"""
+    def findUserById(self, userId):
+        """Abstract Method findUserById"""
 
     @abstractmethod
-    def _findUserByCondition(self, param):
-        """Abstract Method _findUserByCondition"""
+    def findUserByCondition(self, param):
+        """Abstract Method findUserByCondition"""

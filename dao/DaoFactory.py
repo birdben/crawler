@@ -67,6 +67,6 @@ if __name__ == "__main__":
       "id": "25c96207b652a4a50fb4fa2e23790a84",
       "articles_count": 0
     }]
-    response = mongoDao._saveUsers(userInfoList)
-    response = mysqlDao._saveUsers(userInfoList)
-    response = fileDao._saveUsers(userInfoList)
+    response = mongoDao.saveUsers(userInfoList)
+    response = mysqlDao.saveUsers(userInfoList)
+    response = fileDao.saveUsers(userInfoList)

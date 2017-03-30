@@ -10,7 +10,7 @@ class MongoDaoSupport(DaoSupport):
     def __init__(self):
         super().__init__()
 
-    def _getConn(self):
+    def getConn(self):
         rootLogger.debug("MongoDaoSupport getConn start")
         conn = mongo_client.MongoClient(
             host=MongoConfig.HOST,

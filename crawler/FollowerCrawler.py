@@ -32,6 +32,8 @@ class FollowerCrawler(threading.Thread):
             followerCrawlerLogger.debug(requestId + "start FollowerCrawler.fetch...")
             nextFollowerPageRequestUrl = self.followerRequestQueue.pull(requestId)
             followerCrawlerLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
+            if nextFollowerPageRequestUrl is None:
+                continue
             followerObj = self.parseFollowerUrl(nextFollowerPageRequestUrl)
             followerCrawlerLogger.debug(requestId + "followerObj:" + str(followerObj))
             followerRequest = {

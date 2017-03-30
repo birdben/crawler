@@ -25,6 +25,8 @@ class FollowerParser(BaseParser):
             requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
             followerParserLogger.debug(requestId + "start FollowerParser.parse...")
             response = self.followerResponseQueue.pull(requestId)
+            if response is None:
+                continue
             try:
                 if response["status"] == BaseParser.SUCCESS_CODE:
                     responseData = json.loads(response["data"])

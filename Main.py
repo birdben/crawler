@@ -1,7 +1,6 @@
 import time
 
-from logger.LoggingMain import mainLogger
-from cache.UserMemoryCache import UserMemoryCache
+from cache.impl.rds.UserRedisCache import UserRedisCache
 from checker.UserDuplicateChecker import UserDuplicateChecker
 from core.HttpCoreFactory import HttpCoreFactory
 from crawler.FollowerCrawler import FollowerCrawler
@@ -9,18 +8,19 @@ from crawler.UserCrawler import UserCrawler
 from dao.DaoFactory import DaoFactory
 from mq.FollowerRequestQueue import FollowerRequestQueue
 from mq.FollowerResponseQueue import FollowerResponseQueue
-from parser.FollowerParser import FollowerParser
-from parser.UserParser import UserParser
 from mq.UserDuplicateQueue import UserDuplicateQueue
 from mq.UserRequestQueue import UserRequestQueue
 from mq.UserResponseQueue import UserResponseQueue
+from parser.FollowerParser import FollowerParser
+from parser.UserParser import UserParser
 
 
 class Main:
 
     def __init__(self):
 
-        self.userCache = UserMemoryCache()
+        # self.userCache = UserMemoryCache()
+        self.userCache = UserRedisCache()
 
         self.userDuplicateQueue = UserDuplicateQueue()
 

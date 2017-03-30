@@ -46,7 +46,7 @@ class ThreadA(threading.Thread):
 
     def run(self):
         for userId in userIdMap:
-            success = self.cache.put(userId, userIdMap[userId])
+            success = self.cache.put("", userId, userIdMap[userId])
             rootLogger.debug("%s put in cache %s %s" % (threading.currentThread().getName(), userId, str(success)))
             time.sleep(random.randint(0, 10) / 10)
 
@@ -59,12 +59,14 @@ class ThreadB(threading.Thread):
 
     def run(self):
         for userId in userIdMap:
-            success = self.cache.put(userId, userIdMap[userId])
+            success = self.cache.put("", userId, userIdMap[userId])
             rootLogger.debug("%s put in cache %s %s" % (threading.currentThread().getName(), userId, str(success)))
             time.sleep(random.randint(0, 10) / 10)
 
 
 if __name__ == "__main__":
+
+    startTimestamp = time.time()
 
     userIdMap = {}
     for x in range(0, 1000):
@@ -82,12 +84,12 @@ if __name__ == "__main__":
 
     threadAList = []
     for x in range(0, 10):
-        thread = ThreadA("ThreadA" + str(x), cache, userIdMap)
+        thread = ThreadA("UserMemoryCache ThreadA" + str(x), cache, userIdMap)
         threadAList.append(thread)
 
     threadBList = []
     for x in range(0, 10):
-        thread = ThreadB("ThreadB" + str(x), cache, userIdMap)
+        thread = ThreadB("UserMemoryCache ThreadB" + str(x), cache, userIdMap)
         threadBList.append(thread)
 
     for thread in threadAList:
@@ -101,5 +103,20 @@ if __name__ == "__main__":
 
     for thread in threadBList:
         thread.join()
+
+    endTimestamp = time.time()
+
+    # 转换成localtime
+    startTimeLocal = time.localtime(startTimestamp)
+    endTimeLocal = time.localtime(endTimestamp)
+    # 转换成新的时间格式(2016-05-09 18:59:20)
+    startTime = time.strftime("%Y-%m-%d %H:%M:%S", startTimeLocal)
+    endTime = time.strftime("%Y-%m-%d %H:%M:%S", endTimeLocal)
+
+    cost = endTimestamp - startTimestamp
+
+    rootLogger.debug("UserMemoryCache 开始时间：" + startTime)
+    rootLogger.debug("UserMemoryCache 结束时间：" + endTime)
+    rootLogger.debug("UserMemoryCache 耗时：" + str(cost) + "秒")
 
     cache.printAll()

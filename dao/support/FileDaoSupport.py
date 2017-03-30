@@ -6,6 +6,6 @@ class FileDaoSupport(DaoSupport):
     def __init__(self):
         super().__init__()
 
-    def _getConn(self):
+    def getConn(self):
         rootLogger.debug("FileDaoSupport _getConn start")
         rootLogger.debug("FileDaoSupport _getConn end")

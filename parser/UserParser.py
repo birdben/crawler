@@ -26,6 +26,8 @@ class UserParser(BaseParser):
             requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
             userParserLogger.debug(requestId + "start UserParser.parse...")
             response = self.userResponseQueue.pull(requestId)
+            if response is None:
+                continue
             try:
                 if response["status"] == BaseParser.SUCCESS_CODE:
                     userInfo = json.loads(response["data"])

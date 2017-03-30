@@ -7,26 +7,26 @@ class UserFileDaoImpl(FileDaoSupport, UserDao):
     def __init__(self):
         pass
 
-    def _saveUsers(self, userInfoList):
+    def saveUsers(self, userInfoList):
         pass
 
-    def _deleteUserById(self, userId):
+    def deleteUserById(self, userId):
         pass
 
-    def _saveOrUpdateUser(self, userInfo):
+    def saveOrUpdateUser(self, userInfo):
         pass
 
-    def _findUserById(self, userId):
+    def findUserById(self, userId):
         pass
 
-    def _saveOrUpdateUsers(self, userInfoList):
+    def saveOrUpdateUsers(self, userInfoList):
         pass
 
-    def _findUserByCondition(self, param):
+    def findUserByCondition(self, param):
         pass
 
-    def _updateUser(self, userInfo):
+    def updateUser(self, userInfo):
         pass
 
-    def _saveUser(self, userInfo):
+    def saveUser(self, userInfo):
         pass

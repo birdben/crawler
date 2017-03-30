@@ -30,6 +30,8 @@ class UserCrawler(threading.Thread):
             userCrawlerLogger.debug(requestId + "start UserCrawler.fetch...")
             userId = self.userRequestQueue.pull(requestId)
             userCrawlerLogger.debug(requestId + "userId:" + str(userId))
+            if userId is None:
+                continue
             userRequest = {
                 "host": "api.zhihu.com",
                 "method": "GET",
