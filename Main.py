@@ -11,6 +11,11 @@ from mq.FollowerResponseQueue import FollowerResponseQueue
 from mq.UserDuplicateQueue import UserDuplicateQueue
 from mq.UserRequestQueue import UserRequestQueue
 from mq.UserResponseQueue import UserResponseQueue
+from mq.monitor.FollowerRequestQMonitor import FollowerRequestQMonitor
+from mq.monitor.FollowerResponseQMonitor import FollowerResponseQMonitor
+from mq.monitor.UserDuplicateQMonitor import UserDuplicateQMonitor
+from mq.monitor.UserRequestQMonitor import UserRequestQMonitor
+from mq.monitor.UserResponseQMonitor import UserResponseQMonitor
 from parser.FollowerParser import FollowerParser
 from parser.UserParser import UserParser
 
@@ -86,3 +91,10 @@ if __name__ == "__main__":
         threadName = "FollowerCrawler[" + str(i) + "]"
         # mainLogger.debug(threadName)
         main.followerCrawler = FollowerCrawler(threadName, main.followerRequestQueue, main.followerResponseQueue, main.client).start()
+
+    # 启动Queue的监控日志
+    main.followerRequestQMonitor = FollowerRequestQMonitor(main.followerRequestQueue).start()
+    main.followerResponseQMonitor = FollowerResponseQMonitor(main.followerResponseQueue).start()
+    main.userDuplicateQMonitor = UserDuplicateQMonitor(main.userDuplicateQueue).start()
+    main.userRequestQMonitor = UserRequestQMonitor(main.userRequestQueue).start()
+    main.userResponseQMonitor = UserResponseQMonitor(main.userResponseQueue).start()

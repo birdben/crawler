@@ -1,11 +1,12 @@
 import queue
 from logger.LoggingRoot import rootLogger
+from mq.BaseQueue import BaseQueue
 
 
-class FollowerRequestQueue:
+class FollowerRequestQueue(BaseQueue):
 
     def __init__(self):
-        self.followerRequestQueue = queue.Queue(maxsize=10000)
+        self.followerRequestQueue = queue.Queue()
         pass
 
     def push(self, requestId, request):
@@ -16,3 +17,6 @@ class FollowerRequestQueue:
         request = self.followerRequestQueue.get()
         rootLogger.debug(requestId + "FollowerRequestQueue pull:" + str(request))
         return request
+
+    def size(self):
+        return self.followerRequestQueue.qsize()
