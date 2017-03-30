@@ -5,6 +5,10 @@ DOCUMENT_CLASS = dict
 TZ_AWARE = False
 CONNECT = True
 
+# 用户名和密码
+USER = "admin"
+PWD = "admin_password"
+
 # 可选参数
 MAX_POOL_SIZE = 100
 MIN_POOL_SIZE = 20

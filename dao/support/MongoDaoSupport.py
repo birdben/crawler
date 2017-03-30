@@ -21,6 +21,10 @@ class MongoDaoSupport(DaoSupport):
             maxPoolSize=MongoConfig.MAX_POOL_SIZE,
             minPoolSize=MongoConfig.MIN_POOL_SIZE
         )
+        # 建立和数据库系统的连接,创建Connection时，指定host及port参数
+        db_auth = conn.admin
+        # admin 数据库有帐号，连接-认证-切换库
+        db_auth.authenticate(MongoConfig.USER, MongoConfig.PWD)
         try:
             conn.admin.command('ismaster')
         except ConnectionFailure:
