@@ -1,0 +1,1 @@
+docker run -v /Users/yunyu/Downloads/zhihu/redis:/data -p 6379:6379 --name zhihu_redis -d redis:3.2 redis-server /data/conf/redis.conf
