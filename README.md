@@ -1,13 +1,37 @@
 ### 环境搭建
 
+```
+# 安装python3的pip命令如下：
+$ sudo apt-get install python3-pip
+
+# 使用pip3安装python3包的命令如下：
+$ sudo pip3 install packagename
+```
+
 #### 持久化存储
+
+##### Redis
+
+安装redis
+
+```
+# Ubuntu包管理工具安装
+$ sudo apt-get install python3-redis
+
+# pip工具安装
+$ sudo python3 -m pip install redis
+```
 
 ##### MongoDB
 
 安装pymongo
 
 ```
-$ python3 -m pip install pymongo
+# Ubuntu包管理工具安装
+$ sudo apt-get install python3-pymongo
+
+# pip工具安装
+$ sudo python3 -m pip install pymongo
 ```
 
 检查爬取的用户信息是否有重复
@@ -36,19 +60,28 @@ $ db.users.aggregate([
 
 暂不支持
 
+### 组件关系图
+
+![组件关系图](http://img.blog.csdn.net/20170402164109879?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvYmlyZGJlbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
 ### Feature
 
 ##### 2.x Feature
 
 1. 支持MySQL，Elasticsearch等持久化存储
-
-##### 1.0.3 Feature
-
-1. 处理线程的调优
 2. 挂载多个代理IP，不至于被封
-3. 补充组件图
+3. 分布式化多节点爬取
+4. 更换登录Cookie和UA
 
 ### Relase Note
+
+##### 1.0.3:
+
+1. 通用化Redis的管理
+2. 抽象出消息队列BaseQueue，并且实现了MemoryQueue和RedisQueue两种方式的实现（推荐使用RedisQueue替代MemoryQueue）
+3. 统一存储json字符串的消息格式在消息队列中，解决不同消息队列实现消息提取的差异化
+4. 测试使用多线程和多进程的效果
+5. 补充组件关系图
 
 ##### 1.0.2:
 
@@ -57,7 +90,7 @@ $ db.users.aggregate([
 3. 处理从Queue中拉取出来的消息为空的情况
 4. 统一规范方法命名规则
 5. 支持Mongo指定用户名和密码创建连接
-6. 使用Docker容器提供Redis和Mongo服务
+6. 使用Docker容器提供Redis和Mongo服务，补充了Docker相关的使用文档
 7. 通过日志监控Queue的堆积情况，不限制Queue的大小
 
 ##### 1.0.1:

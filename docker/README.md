@@ -16,7 +16,7 @@ local  0.000GB
 > use admin
 
 # 创建admin用户
-> db.createUser({ user: 'admin', pwd: 'admin_password', roles: [ { role: "readWriteAnyDatabase", db: "admin" }, { role: "userAdminAnyDatabase", db: "admin" } ] });
+> db.createUser({ user: 'admin', pwd: 'admin_password', roles: [ { role: "readWriteAnyDatabase", db: "admin" }, { role: "userAdminAnyDatabase", db: "admin" }, { role: "clusterMonitor", db:"admin" } ] });
 
 # 查看admin数据库下的collection表
 > show tables;
