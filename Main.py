@@ -1,4 +1,13 @@
+#!/usr/bin/python3
+# coding=utf-8
+
 import time
+
+from mq.impl.memory.FollowerResponseMemoryQueue import FollowerResponseMemoryQueue
+from mq.impl.memory.FollowerRequestMemoryQueue import FollowerRequestMemoryQueue
+from mq.impl.memory.UserDuplicateMemoryQueue import UserDuplicateMemoryQueue
+from mq.impl.memory.UserRequestMemoryQueue import UserRequestMemoryQueue
+from mq.impl.memory.UserResponseMemoryQueue import UserResponseMemoryQueue
 
 from cache.impl.rds.UserRedisCache import UserRedisCache
 from checker.UserDuplicateChecker import UserDuplicateChecker
@@ -6,11 +15,11 @@ from core.HttpCoreFactory import HttpCoreFactory
 from crawler.FollowerCrawler import FollowerCrawler
 from crawler.UserCrawler import UserCrawler
 from dao.DaoFactory import DaoFactory
-from mq.FollowerRequestQueue import FollowerRequestQueue
-from mq.FollowerResponseQueue import FollowerResponseQueue
-from mq.UserDuplicateQueue import UserDuplicateQueue
-from mq.UserRequestQueue import UserRequestQueue
-from mq.UserResponseQueue import UserResponseQueue
+from mq.impl.rds.FollowerRequestRedisQueue import FollowerRequestRedisQueue
+from mq.impl.rds.FollowerResponseRedisQueue import FollowerResponseRedisQueue
+from mq.impl.rds.UserDuplicateRedisQueue import UserDuplicateRedisQueue
+from mq.impl.rds.UserRequestRedisQueue import UserRequestRedisQueue
+from mq.impl.rds.UserResponseRedisQueue import UserResponseRedisQueue
 from mq.monitor.FollowerRequestQMonitor import FollowerRequestQMonitor
 from mq.monitor.FollowerResponseQMonitor import FollowerResponseQMonitor
 from mq.monitor.UserDuplicateQMonitor import UserDuplicateQMonitor
@@ -27,15 +36,20 @@ class Main:
         # self.userCache = UserMemoryCache()
         self.userCache = UserRedisCache()
 
-        self.userDuplicateQueue = UserDuplicateQueue()
+        # self.userDuplicateQueue = UserDuplicateMemoryQueue()
+        self.userDuplicateQueue = UserDuplicateRedisQueue()
 
-        self.userRequestQueue = UserRequestQueue()
+        # self.userRequestQueue = UserRequestMemoryQueue()
+        self.userRequestQueue = UserRequestRedisQueue()
 
-        self.userResponseQueue = UserResponseQueue()
+        # self.userResponseQueue = UserResponseMemoryQueue()
+        self.userResponseQueue = UserResponseRedisQueue()
 
-        self.followerRequestQueue = FollowerRequestQueue()
+        # self.followerRequestQueue = FollowerRequestMemoryQueue()
+        self.followerRequestQueue = FollowerRequestRedisQueue()
 
-        self.followerResponseQueue = FollowerResponseQueue()
+        # self.followerResponseQueue = FollowerResponseMemoryQueue()
+        self.followerResponseQueue = FollowerResponseRedisQueue()
 
         httpCoreFactory = HttpCoreFactory()
         self.client = httpCoreFactory.createHttpCore(HttpCoreFactory.HTTP_URLLIB)

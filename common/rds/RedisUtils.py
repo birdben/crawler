@@ -1,8 +1,8 @@
 import redis
 
-from cache.impl.rds import RedisConfig
+from common.rds import RedisConfig
 
-RedisClient = redis.Redis(RedisConfig.HOST, RedisConfig.PORT, RedisConfig.DB, RedisConfig.PWD)
+RedisClient = redis.StrictRedis(RedisConfig.HOST, RedisConfig.PORT, RedisConfig.DB, RedisConfig.PWD)
 
 
 class RedisUtils:
@@ -53,6 +53,18 @@ class RedisUtils:
     @staticmethod
     def set(name, value):
         return RedisClient.set(name, value)
+
+    @staticmethod
+    def lpush(name, value):
+        return RedisClient.lpush(name, value)
+
+    @staticmethod
+    def blpop(name):
+        return RedisClient.blpop(name, 0)[1]
+
+    @staticmethod
+    def llen(name):
+        return RedisClient.llen(name)
 
 
 if __name__ == "__main__":

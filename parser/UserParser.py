@@ -38,7 +38,10 @@ class UserParser(BaseParser):
                     # 初始化follower接口参数，并且存储到followerRequestQueue中
                     followerUrl = "https://api.zhihu.com/people/" + userId + "/followers?limit=20&offset=0"
                     userParserLogger.debug(requestId + "followerUrl:" + str(followerUrl))
-                    self.followerRequestQueue.push(requestId, followerUrl)
+                    followerObj = {
+                        "message": followerUrl
+                    }
+                    self.followerRequestQueue.push(requestId, followerObj)
                 else:
                     userParserLogger.debug("Response Error:" + response["reason"])
                 userParserLogger.debug(requestId + "end UserParser.parse...")

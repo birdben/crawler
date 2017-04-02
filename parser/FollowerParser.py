@@ -36,7 +36,10 @@ class FollowerParser(BaseParser):
                         if not paging["is_end"]:
                             nextFollowerPageRequestUrl = paging["next"]
                             followerParserLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
-                            self.followerRequestQueue.push(requestId, nextFollowerPageRequestUrl)
+                            nextFollowerPageRequestObj = {
+                                "message": nextFollowerPageRequestUrl
+                            }
+                            self.followerRequestQueue.push(requestId, nextFollowerPageRequestObj)
 
                     followerList = responseData["data"]
                     # 这里不能直接存储follower信息，因为不能保证唯一性，需要先解析followerId然后存入DuplicateQueue验证唯一后，在通过UserParser存储到DB

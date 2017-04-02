@@ -3,7 +3,7 @@ import threading
 import time
 
 from cache.BaseCache import BaseCache
-from cache.impl.rds.RedisUtils import RedisUtils
+from common.rds.RedisUtils import RedisUtils
 from logger.LoggingRoot import rootLogger
 
 

@@ -28,10 +28,11 @@ class UserCrawler(threading.Thread):
             time.sleep(random.randint(UserCrawler.SLEEP_TIME_MIN, UserCrawler.SLEEP_TIME_MAX))
             requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
             userCrawlerLogger.debug(requestId + "start UserCrawler.fetch...")
-            userId = self.userRequestQueue.pull(requestId)
-            userCrawlerLogger.debug(requestId + "userId:" + str(userId))
-            if userId is None:
+            userObj = self.userRequestQueue.pull(requestId)
+            userCrawlerLogger.debug(requestId + "userId:" + str(userObj))
+            if userObj is None:
                 continue
+            userId = userObj["message"]
             userRequest = {
                 "host": "api.zhihu.com",
                 "method": "GET",

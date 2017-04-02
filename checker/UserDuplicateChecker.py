@@ -31,7 +31,10 @@ class UserDuplicateChecker(threading.Thread):
             userId = userInfo["userId"]
             if self.userCache.put(requestId, userId, userInfo):
                 # 添加到缓存返回True，说明缓存中用户信息不存在，要添加到requestQueue中
-                self.userRequestQueue.push(requestId, userId)
+                userObj = {
+                    "message": userId
+                }
+                self.userRequestQueue.push(requestId, userObj)
             else:
                 # 添加到缓存返回False，说明缓存中用户信息已经存在，继续读取其他DuplicateQueue的消息
                 continue

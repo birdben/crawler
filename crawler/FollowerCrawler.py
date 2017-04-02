@@ -30,10 +30,11 @@ class FollowerCrawler(threading.Thread):
             time.sleep(random.randint(FollowerCrawler.SLEEP_TIME_MIN, FollowerCrawler.SLEEP_TIME_MAX))
             requestId = "threadName_" + self.threadName + "_" + str(time.time()) + ": "
             followerCrawlerLogger.debug(requestId + "start FollowerCrawler.fetch...")
-            nextFollowerPageRequestUrl = self.followerRequestQueue.pull(requestId)
-            followerCrawlerLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestUrl))
-            if nextFollowerPageRequestUrl is None:
+            nextFollowerPageRequestObj = self.followerRequestQueue.pull(requestId)
+            followerCrawlerLogger.debug(requestId + "nextFollowerPageRequestUrl:" + str(nextFollowerPageRequestObj))
+            if nextFollowerPageRequestObj is None:
                 continue
+            nextFollowerPageRequestUrl = nextFollowerPageRequestObj["message"]
             followerObj = self.parseFollowerUrl(nextFollowerPageRequestUrl)
             followerCrawlerLogger.debug(requestId + "followerObj:" + str(followerObj))
             followerRequest = {
