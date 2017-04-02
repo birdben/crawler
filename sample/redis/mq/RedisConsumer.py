@@ -1,3 +1,4 @@
+import json
 import threading
 
 import time
@@ -11,6 +12,11 @@ class RedisConsumer(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(5)
-            task = self.redisConn.blpop(self.queue, 0)[1]
-            print("Task get", task)
+            time.sleep(2)
+            message = self.redisConn.blpop(self.queue, 0)[1]
+            print("RedisConsumer get", message)
+            jsonMsg = bytes.decode(message)
+            print("jsonMsg:" + jsonMsg)
+            msgObj = eval(jsonMsg)
+            print(msgObj["userId"])
+            print(msgObj["userName"])

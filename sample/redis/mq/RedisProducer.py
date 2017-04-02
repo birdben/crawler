@@ -13,4 +13,8 @@ class RedisProducer(threading.Thread):
         while True:
             time.sleep(2)
             timestamp = time.time()
-            self.redisConn.lpush(self.queue, timestamp)
+            userInfo = {
+                "userId": "followerId_" + str(timestamp),
+                "userName": "followerName_" + str(timestamp)
+            }
+            self.redisConn.lpush(self.queue, userInfo)
