@@ -3,6 +3,7 @@ import threading
 import time
 
 from logger.monitor.LoggingUserDuplicateQMonitor import userDuplicateQMonitorLogger
+from mq.monitor.MonitorConfig import SLEEP_TIME
 
 
 class UserDuplicateQMonitor(threading.Thread):
@@ -13,5 +14,5 @@ class UserDuplicateQMonitor(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(1)
+            time.sleep(SLEEP_TIME)
             userDuplicateQMonitorLogger.debug(self.userDuplicateQueue.size())

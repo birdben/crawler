@@ -3,6 +3,7 @@ import threading
 import time
 
 from logger.monitor.LoggingFollowerResponseQMonitor import followerResponseQMonitorLogger
+from mq.monitor.MonitorConfig import SLEEP_TIME
 
 
 class FollowerResponseQMonitor(threading.Thread):
@@ -13,5 +14,5 @@ class FollowerResponseQMonitor(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(1)
+            time.sleep(SLEEP_TIME)
             followerResponseQMonitorLogger.debug(self.followerResponseQueue.size())
