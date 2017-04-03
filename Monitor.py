@@ -2,11 +2,13 @@
 # coding=utf-8
 
 from cache.impl.rds.UserRedisCache import UserRedisCache
+from dao.DaoFactory import DaoFactory
 from mq.impl.rds.FollowerRequestRedisQueue import FollowerRequestRedisQueue
 from mq.impl.rds.FollowerResponseRedisQueue import FollowerResponseRedisQueue
 from mq.impl.rds.UserDuplicateRedisQueue import UserDuplicateRedisQueue
 from mq.impl.rds.UserRequestRedisQueue import UserRequestRedisQueue
 from mq.impl.rds.UserResponseRedisQueue import UserResponseRedisQueue
+from mq.monitor.DatabaseMonitor import DatabaseMonitor
 from mq.monitor.FollowerRequestQMonitor import FollowerRequestQMonitor
 from mq.monitor.FollowerResponseQMonitor import FollowerResponseQMonitor
 from mq.monitor.UserDuplicateQMonitor import UserDuplicateQMonitor
@@ -30,6 +32,9 @@ class Monitor:
 
         self.followerResponseQueue = FollowerResponseRedisQueue()
 
+        daoFactory = DaoFactory()
+        self.dao = daoFactory.createUserDao(DaoFactory.MONGO)
+
         pass
 
 if __name__ == "__main__":
@@ -41,3 +46,6 @@ if __name__ == "__main__":
     monitor.userDuplicateQMonitor = UserDuplicateQMonitor(monitor.userDuplicateQueue).start()
     monitor.userRequestQMonitor = UserRequestQMonitor(monitor.userRequestQueue).start()
     monitor.userResponseQMonitor = UserResponseQMonitor(monitor.userResponseQueue).start()
+
+    # 启动DB的监控日志
+    monitor.databaseMonitor = DatabaseMonitor(monitor.dao).start()

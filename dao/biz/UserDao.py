@@ -37,3 +37,7 @@ class UserDao(metaclass=ABCMeta):
     @abstractmethod
     def findUserByCondition(self, param):
         """Abstract Method findUserByCondition"""
+
+    @abstractmethod
+    def countAllUsers(self):
+        """Abstract Method countAllUsers"""

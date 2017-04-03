@@ -20,6 +20,16 @@ class UserMongoDaoImpl(MongoDaoSupport, UserDao):
     def updateUser(self, userInfo):
         pass
 
+    def countAllUsers(self):
+        try:
+            conn = self.getConn()
+            db = conn[DB_ZHIHU]
+            users = db[TABLE_USER]
+            count = users.count()
+        except Exception as e:
+            rootLogger.error(e)
+        return count
+
     def __init__(self):
         super().__init__()
 
