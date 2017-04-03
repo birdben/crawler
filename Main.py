@@ -1,14 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-import time
-
-from mq.impl.memory.FollowerResponseMemoryQueue import FollowerResponseMemoryQueue
-from mq.impl.memory.FollowerRequestMemoryQueue import FollowerRequestMemoryQueue
-from mq.impl.memory.UserDuplicateMemoryQueue import UserDuplicateMemoryQueue
-from mq.impl.memory.UserRequestMemoryQueue import UserRequestMemoryQueue
-from mq.impl.memory.UserResponseMemoryQueue import UserResponseMemoryQueue
-
 from cache.impl.rds.UserRedisCache import UserRedisCache
 from checker.UserDuplicateChecker import UserDuplicateChecker
 from core.HttpCoreFactory import HttpCoreFactory
@@ -20,11 +12,6 @@ from mq.impl.rds.FollowerResponseRedisQueue import FollowerResponseRedisQueue
 from mq.impl.rds.UserDuplicateRedisQueue import UserDuplicateRedisQueue
 from mq.impl.rds.UserRequestRedisQueue import UserRequestRedisQueue
 from mq.impl.rds.UserResponseRedisQueue import UserResponseRedisQueue
-from mq.monitor.FollowerRequestQMonitor import FollowerRequestQMonitor
-from mq.monitor.FollowerResponseQMonitor import FollowerResponseQMonitor
-from mq.monitor.UserDuplicateQMonitor import UserDuplicateQMonitor
-from mq.monitor.UserRequestQMonitor import UserRequestQMonitor
-from mq.monitor.UserResponseQMonitor import UserResponseQMonitor
 from parser.FollowerParser import FollowerParser
 from parser.UserParser import UserParser
 
@@ -33,22 +20,16 @@ class Main:
 
     def __init__(self):
 
-        # self.userCache = UserMemoryCache()
         self.userCache = UserRedisCache()
 
-        # self.userDuplicateQueue = UserDuplicateMemoryQueue()
         self.userDuplicateQueue = UserDuplicateRedisQueue()
 
-        # self.userRequestQueue = UserRequestMemoryQueue()
         self.userRequestQueue = UserRequestRedisQueue()
 
-        # self.userResponseQueue = UserResponseMemoryQueue()
         self.userResponseQueue = UserResponseRedisQueue()
 
-        # self.followerRequestQueue = FollowerRequestMemoryQueue()
         self.followerRequestQueue = FollowerRequestRedisQueue()
 
-        # self.followerResponseQueue = FollowerResponseMemoryQueue()
         self.followerResponseQueue = FollowerResponseRedisQueue()
 
         httpCoreFactory = HttpCoreFactory()
@@ -62,24 +43,12 @@ class Main:
 if __name__ == "__main__":
     main = Main()
 
-    userList = [
-        {"userId": "6a297a7a0fab18009e3dcd0add13fa9a", "urlToken": "chenlinux"},
-        {"userId": "0c53915891637302da2599ff75af6b8c", "urlToken": "xiao-qu-69"},
-        {"userId": "7bb609d065bab68b97c413181763bb71", "urlToken": "wo-pang"},
-        {"userId": "2b6d37fa721f5d25153662b7e3a80a0d", "urlToken": "ding-dang-71-16"},
-        {"userId": "6fad38c728e560c15a5c64b2e283be3e", "urlToken": "hong-liang-808-624"}
-    ]
-
     # 设置各个处理器的线程数
     UserDuplicateCheckerThreadCount = 5
     UserParserThreadCount = 5
     UserCrawlerThreadCount = 5
     FollowerParserThreadCount = 5
     FollowerCrawlerThreadCount = 5
-
-    requestId = "threadName_" + "Main" + "_" + str(time.time()) + ": "
-    for user in userList:
-        main.userDuplicateQueue.push(requestId, user)
 
     for i in range(0, UserDuplicateCheckerThreadCount):
         threadName = "UserDuplicateChecker[" + str(i) + "]"
@@ -105,10 +74,3 @@ if __name__ == "__main__":
         threadName = "FollowerCrawler[" + str(i) + "]"
         # mainLogger.debug(threadName)
         main.followerCrawler = FollowerCrawler(threadName, main.followerRequestQueue, main.followerResponseQueue, main.client).start()
-
-    # 启动Queue的监控日志
-    main.followerRequestQMonitor = FollowerRequestQMonitor(main.followerRequestQueue).start()
-    main.followerResponseQMonitor = FollowerResponseQMonitor(main.followerResponseQueue).start()
-    main.userDuplicateQMonitor = UserDuplicateQMonitor(main.userDuplicateQueue).start()
-    main.userRequestQMonitor = UserRequestQMonitor(main.userRequestQueue).start()
-    main.userResponseQMonitor = UserResponseQMonitor(main.userResponseQueue).start()
