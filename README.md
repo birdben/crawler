@@ -60,6 +60,58 @@ $ db.users.aggregate([
 
 暂不支持
 
+### VPS服务器配置
+
+#### 配置PYTHONPATH
+
+如果不配置PYTHONPATH，python无法在终端运行
+
+```
+export PYTHONPATH=$PYTHONPATH:/Users/yunyu/workspace_python/crawler
+```
+
+#### 配置hosts
+
+修改/etc/hosts配置
+
+```
+10.10.0.100		DataCenter
+10.10.0.101		CrawlerNode1
+10.10.0.102		CrawlerNode2
+```
+
+#### 配置局域网IP
+
+修改/etc/network/interfaces网卡配置如下：
+
+```
+auto lo
+iface lo inet loopback
+
+auto ens3
+iface ens3 inet static
+	address XX.XX.XX.XX
+	netmask 255.255.254.0
+	gateway XX.XX.XX.XX
+	dns-nameservers XX.XX.XX.XX
+	post-up ip route add 169.254.0.0/16 dev ens3
+
+auto ens7
+iface ens7 inet static
+	address 10.10.0.101
+	netmask 255.255.0.0
+	mtu 1450
+```
+
+- XX.XX.XX.XX : 外网IP
+- 10.10.0.101 : 内网IP
+
+修改后需要重启网卡
+
+```
+$ sudo /etc/init.d/networking restart
+```
+
 ### 组件关系图
 
 ![组件关系图](http://img.blog.csdn.net/20170402164109879?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvYmlyZGJlbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
@@ -74,6 +126,14 @@ $ db.users.aggregate([
 4. 更换登录Cookie和UA
 
 ### Relase Note
+
+##### 2.0.0:
+
+1. 查看堆积的Queue的程度，适当调整线程数量（调小Duplicate，Parser的线程数，入库速度反而会慢很多）
+2. 尝试多线程切换成多进程(未完成)
+3. 添加UserRequest处理失败的情况(未完成)
+4. 添加时间戳字段(未完成)
+5. 修改初始用户数据(未完成)
 
 ##### 1.0.3:
 

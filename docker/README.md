@@ -15,8 +15,14 @@ local  0.000GB
 # 使用admin数据库
 > use admin
 
-# 创建admin用户
+# 在admin数据库下创建admin用户
 > db.createUser({ user: 'admin', pwd: 'admin_password', roles: [ { role: "readWriteAnyDatabase", db: "admin" }, { role: "userAdminAnyDatabase", db: "admin" }, { role: "clusterMonitor", db:"admin" } ] });
+
+# 使用zhihu数据库
+> use zhihu
+
+# 在zhihu数据库下创建zhihu用户
+> db.createUser({ user: 'zhihu', pwd: 'zhihu_password', roles: [ { role: "readWrite", db: "zhihu" }, { role: "dbAdmin", db: "zhihu" }, { role: "backup", db:"admin" }, { role: "restore", db:"admin" } ] });
 
 # 查看admin数据库下的collection表
 > show tables;
@@ -38,6 +44,7 @@ $ mongo 127.0.0.1:27017 -u admin -p admin_password --authenticationDatabase admi
 - https://hub.docker.com/_/mongo/
 - https://github.com/docker-library/mongo/blob/1047c0e9975a32102595bc824a2655dee22e595a/3.2/Dockerfile
 - http://blog.csdn.net/lyj1101066558/article/details/50606628
+- http://blog.csdn.net/jianlong727/article/details/53889990
 
 ### Redis容器配置
 
